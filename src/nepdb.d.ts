@@ -60,7 +60,7 @@ export interface Request {
   status: number;
   result: any | ErrorResult;
   user: User;
-  role: Role;
+  role: number | Role;
   nq: NepQ;
   token: string;
   timestamp: RequestTimestamp;

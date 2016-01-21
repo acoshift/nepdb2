@@ -2,12 +2,13 @@
 import express = require('express');
 // import bcrypt = require('bcryptjs');
 import cookieParser = require('cookie-parser');
-// import _ = require('lodash');
+import _ = require('lodash');
 // import jwt = require('jsonwebtoken');
 // import ms = require('ms');
 import { Observable } from 'rxjs';
 import { Request } from './nepdb.d';
 import { decode } from './utils';
+import httpStatus = require('http-status');
 
 // javascript import
 var compression = require('compression');
@@ -23,6 +24,7 @@ var libs = {
   log: require('./lib/log'),
   alias: require('./lib/alias'),
   token: require('./lib/token'),
+  op: require('./lib/op'),
 };
 
 // config
@@ -34,10 +36,12 @@ config.server.port = config.server.port || 8000;
 var request: (req, res) => void = (() => {
   let response = (r: Request) => {
     console.log('process time: ' + (r.timestamp.end - r.timestamp.start) + ' ms');
-    if (r.status === 204) {
-      r.res.sendStatus(204);
+    r.res.status(r.status);
+
+    if (_.isUndefined(r.result)) {
+      r.res.end();
     } else {
-      r.res.status(r.status).json(r.result);
+      r.res.json(r.result);
     }
   };
 
@@ -49,7 +53,7 @@ var request: (req, res) => void = (() => {
       db: null,
       ns: '',
       status: 200,
-      result: null,
+      result: undefined,
       user: null,
       role: null,
       nq: null,
@@ -70,6 +74,7 @@ var request: (req, res) => void = (() => {
       .do(libs.token)
       .flatMap<Request>(libs.db)
       .flatMap<Request>(libs.cors)
+      .flatMap<Request>(libs.op)
       .catch(r => Observable.of(r))
       .do(r => r.timestamp.end = Date.now())
       .do(libs.log)
@@ -89,3 +94,7 @@ app.use(request);
 
 app.listen(config.server.port);
 console.log(`Server listening on port ${config.server.port}`);
+
+process.on('uncaughtException', (err: Error) => {
+  console.error(err.stack);
+});

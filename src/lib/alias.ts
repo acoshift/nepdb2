@@ -12,7 +12,7 @@ var alias = {
   ln: 'login',
   lo: 'logout',
   ui: 'user',
-  ur: 'role'
+  ur: 'role',
 };
 
 export = function(r: Request): void {

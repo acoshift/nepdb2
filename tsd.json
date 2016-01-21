@@ -34,6 +34,9 @@
     },
     "lodash/lodash.d.ts": {
       "commit": "3a666d1bff92e944488c25599ec56a4937c17c4e"
+    },
+    "http-status/http-status.d.ts": {
+      "commit": "2cad4a3cff770c37b40496188c246b1a60e87e2d"
     }
   }
 }

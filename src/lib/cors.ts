@@ -1,5 +1,6 @@
 import { Request } from '../nepdb.d';
 import { Observable } from 'rxjs';
+import httpStatus = require('http-status');
 
 export = function(r: Request): Observable<Request> {
   let { req, res } = r;
@@ -7,7 +8,7 @@ export = function(r: Request): Observable<Request> {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, If-None-Match');
   res.header('Access-Control-Expose-Headers', 'etag');
   if (req.method === 'OPTIONS') {
-    r.status = 204;
+    r.status = httpStatus.NO_CONTENT;
     return Observable.throw(r);
   }
   return Observable.of(r);

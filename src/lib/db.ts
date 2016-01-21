@@ -2,6 +2,8 @@ import { Request, Config } from '../nepdb.d';
 import { Observable, Observer } from 'rxjs';
 import { MongoClient, Db } from 'mongodb';
 import qs = require('querystring');
+import httpStatus = require('http-status');
+import { reject } from '../utils';
 
 var db: Db = null;
 
@@ -29,11 +31,9 @@ export = function(r: Request): Observable<Request> {
     return Observable.of(r);
   }
   return Observable.create((observer: Observer<Request>) => {
-    connect(r.config, (err, _db) => {
+    connect(r.config, (err: Error, _db) => {
       if (err) {
-        r.status = 500;
-        r.result = err;
-        observer.error(r);
+        observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
         return;
       }
       r.db = db;
