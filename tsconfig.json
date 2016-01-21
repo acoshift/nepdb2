@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "isolatedModules": false,
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "declaration": false,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "noLib": false,
+    "preserveConstEnums": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "outDir": "build"
+  },
+  "filesGlob": [
+    "**/*.ts",
+    "**/*.tsx",
+    "!node_modules/**"
+  ],
+  "compileOnSave": true,
+  "buildOnSave": false,
+  "files": [
+    "src/config.ts",
+    "src/index.ts",
+    "src/lib/alias.ts",
+    "src/lib/cors.ts",
+    "src/lib/db.ts",
+    "src/lib/log.ts",
+    "src/lib/nq.ts",
+    "src/lib/ns.ts",
+    "src/lib/token.ts",
+    "src/nepdb.d.ts",
+    "src/utils.ts",
+    "typings/bcryptjs/bcryptjs.d.ts",
+    "typings/cookie-parser/cookie-parser.d.ts",
+    "typings/express/express.d.ts",
+    "typings/jsonwebtoken/jsonwebtoken.d.ts",
+    "typings/lodash/lodash.d.ts",
+    "typings/mime/mime.d.ts",
+    "typings/mongodb/mongodb.d.ts",
+    "typings/ms/ms.d.ts",
+    "typings/node/node.d.ts",
+    "typings/serve-static/serve-static.d.ts",
+    "typings/tsd.d.ts"
+  ],
+  "atom": {
+    "rewriteTsconfig": true
+  }
+}

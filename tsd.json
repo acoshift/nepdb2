@@ -5,9 +5,6 @@
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
   "installed": {
-    "compression/compression.d.ts": {
-      "commit": "3a666d1bff92e944488c25599ec56a4937c17c4e"
-    },
     "express/express.d.ts": {
       "commit": "3a666d1bff92e944488c25599ec56a4937c17c4e"
     },
