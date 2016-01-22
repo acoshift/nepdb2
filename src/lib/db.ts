@@ -27,7 +27,7 @@ connect(require('../config'));
 
 export = function(r: Request): Observable<Request> {
   if (db !== null) {
-    r.db = db;
+    r.db = db.db(r.ns);
     return Observable.of(r);
   }
   return Observable.create((observer: Observer<Request>) => {
@@ -36,7 +36,7 @@ export = function(r: Request): Observable<Request> {
         observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
         return;
       }
-      r.db = db;
+      r.db = db.db(r.ns);
       observer.next(r);
       observer.complete();
     });

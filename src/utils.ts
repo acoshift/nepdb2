@@ -55,10 +55,10 @@ export function reject(r: Request, status?: number, name?: string, message?: str
 }
 
 export function collectionName(r: Request, ns?: string): string {
-  if (_.isUndefined(ns)) ns = r.ns;
-  return ns.split('.').concat(r.nq.name.split('.')).filter(x => x !== '').join('.');
+  if (_.isUndefined(ns)) ns = r.nq.name;
+  return ns;
 }
 
 export function collection(r: Request, ns?: string): Collection {
-  return r.db.collection(collectionName(r));
+  return r.db.collection(collectionName(r, ns));
 }

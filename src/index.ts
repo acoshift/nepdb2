@@ -25,6 +25,7 @@ var libs = {
   alias: require('./lib/alias'),
   token: require('./lib/token'),
   op: require('./lib/op'),
+  responseFilter: require('./lib/response-filter'),
 };
 
 // config
@@ -75,6 +76,7 @@ var request: (req, res) => void = (() => {
       .flatMap<Request>(libs.db)
       .flatMap<Request>(libs.cors)
       .flatMap<Request>(libs.op)
+      .do(libs.responseFilter)
       .catch(r => Observable.of(r))
       .do(r => r.timestamp.end = Date.now())
       .do(libs.log)

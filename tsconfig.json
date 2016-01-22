@@ -45,6 +45,7 @@
     "src/lib/op/role.ts",
     "src/lib/op/update.ts",
     "src/lib/op/user.ts",
+    "src/lib/response-filter.ts",
     "src/lib/token.ts",
     "src/nepdb.d.ts",
     "src/utils.ts",
