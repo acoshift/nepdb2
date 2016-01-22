@@ -54,8 +54,11 @@ export function reject(r: Request, status?: number, name?: string, message?: str
   return r;
 }
 
-export function collection(r: Request, ns?: string): Collection {
+export function collectionName(r: Request, ns?: string): string {
   if (_.isUndefined(ns)) ns = r.ns;
-  let p = ns.split('.').concat(r.nq.name.split('.')).filter(x => x !== '').join('.');
-  return r.db.collection(p);
+  return ns.split('.').concat(r.nq.name.split('.')).filter(x => x !== '').join('.');
+}
+
+export function collection(r: Request, ns?: string): Collection {
+  return r.db.collection(collectionName(r));
 }

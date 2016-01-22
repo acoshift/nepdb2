@@ -1,7 +1,7 @@
 import { Request } from '../../nepdb.d';
 import { Observable, Observer } from 'rxjs';
 import _ = require('lodash');
-import { canAccess, reject, collection, objectId } from '../../utils';
+import { canAccess, reject, collection, objectId, collectionName } from '../../utils';
 import httpStatus = require('http-status');
 
 export = function(r: Request): Observable<Request> {
@@ -11,7 +11,9 @@ export = function(r: Request): Observable<Request> {
 
   let nq = r.nq;
 
-  if (!_.every(nq.params, _.isString)) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
+  if (_.isEmpty(nq.params) || !_.every(nq.params, _.isString)) {
+    return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
+  }
 
   let params = _(nq.params).map(objectId).filter(x => !!x).value();
 
@@ -21,24 +23,17 @@ export = function(r: Request): Observable<Request> {
   }
 
   return Observable.create((observer: Observer<Request>) => {
-    collection(r).find(query).toArray((err, res) => {
+    let ns = collectionName(r);
+    let cursor = collection(r).find(query);
+    let batch = collection(r, 'db.trash').initializeUnorderedBulkOp(null);
+    cursor.forEach(x => {
+      batch.insert({ db: ns, data: x, _owner: r.user._id || undefined });
+    }, null);
+    batch.execute((err, res) => {
       if (err) {
         observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
         return;
       }
-      if (_.isEmpty(res)) {
-        r.result = {
-          ok: 1,
-          n: 0
-        };
-        observer.next(r);
-        observer.complete();
-        return;
-      }
-      if (r.user._id) {
-        _.forEach(res, x => x._owner = r.user._id);
-      }
-      collection(r, 'db.trash').insertMany(res, { w: 0 }, null);
       collection(r).deleteMany(query, (err, res) => {
         if (err) {
           observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
