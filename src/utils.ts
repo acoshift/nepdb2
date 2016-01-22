@@ -1,4 +1,4 @@
-import { ObjectID } from 'mongodb';
+import { ObjectID, Collection } from 'mongodb';
 import { Role, Request, ErrorResult } from './nepdb.d';
 import _ = require('lodash');
 import httpStatus = require('http-status');
@@ -40,7 +40,8 @@ export function canAccess(role: number | Role, group: string, ns: string): numbe
   return 0;
 }
 
-export function reject(r: Request, status: number, name?: string, message?: string): Request {
+export function reject(r: Request, status?: number, name?: string, message?: string): Request {
+  if (_.isUndefined(status)) status = httpStatus.INTERNAL_SERVER_ERROR;
   if (_.isUndefined(name)) name = 'NepDB';
   if (_.isUndefined(message)) message = httpStatus[status];
 
@@ -49,5 +50,12 @@ export function reject(r: Request, status: number, name?: string, message?: stri
     name: name,
     message: message
   };
+
   return r;
+}
+
+export function collection(r: Request, ns?: string): Collection {
+  if (_.isUndefined(ns)) ns = r.ns;
+  let p = ns.split('.').concat(r.nq.name.split('.')).filter(x => x !== '').join('.');
+  return r.db.collection(p);
 }

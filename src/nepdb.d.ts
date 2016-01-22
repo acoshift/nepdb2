@@ -1,5 +1,5 @@
 import express = require('express');
-import { Db } from 'mongodb';
+import { Db, ObjectID } from 'mongodb';
 import { NepQ } from 'nepq';
 
 export interface Config {
@@ -38,6 +38,7 @@ export interface ErrorResult {
 }
 
 export interface User {
+  _id: ObjectID;
   name: string;
   role: string;
 }
@@ -64,4 +65,9 @@ export interface Request {
   nq: NepQ;
   token: string;
   timestamp: RequestTimestamp;
+}
+
+interface ReadOptions {
+  limit?: number;
+  skip?: number;
 }
