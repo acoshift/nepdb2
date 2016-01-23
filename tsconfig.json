@@ -14,7 +14,7 @@
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true,
     "outDir": "build",
-    "sourceMap": true
+    "sourceMap": false
   },
   "filesGlob": [
     "src/**/*.ts",
@@ -48,6 +48,7 @@
     "src/lib/op/user.ts",
     "src/lib/preprocess.ts",
     "src/lib/renew-token.ts",
+    "src/lib/request-filter.ts",
     "src/lib/response-filter.ts",
     "src/lib/role.ts",
     "src/lib/token.ts",

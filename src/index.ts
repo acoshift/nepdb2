@@ -29,6 +29,7 @@ var libs = {
   role: require('./lib/role'),
   renewToken: require('./lib/renew-token'),
   preprocess: require('./lib/preprocess'),
+  requestFilter: require('./lib/request-filter'),
 };
 
 // config
@@ -55,7 +56,7 @@ var request: (req, res) => void = (() => {
       res: res,
       config: config,
       db: null,
-      ns: '',
+      ns: 'nepdb',
       status: 200,
       result: undefined,
       user: null,
@@ -72,6 +73,7 @@ var request: (req, res) => void = (() => {
     Observable
       .of(createRequest(req, res))
       .do(r => r.timestamp.start = Date.now())
+      .flatMap<Request>(libs.requestFilter)
       .do(libs.ns)
       .flatMap<Request>(libs.db)
       .flatMap<Request>(libs.cors)

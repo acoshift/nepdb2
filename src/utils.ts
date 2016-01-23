@@ -62,6 +62,7 @@ export function collectionName(r: Request, ns?: string): string {
 }
 
 export function collection(r: Request, ns?: string): Collection {
+  if (!r.db) return null;
   return r.db.collection(collectionName(r, ns));
 }
 

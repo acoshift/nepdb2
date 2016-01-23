@@ -4,13 +4,14 @@ import { collection } from '../utils';
 export = function(r: Request): void {
   let l = {
     ns: r.ns,
-    user: r.user._id,
-    role: r.user.role,
-    nq: {
+    user: r.user ? r.user._id : null,
+    role: r.user ? r.user.role : null,
+    nq: r.nq ? {
       method: r.nq.method,
       name: r.nq.name
-    },
+    } : null,
     status: r.status
   };
-  collection(r, 'db.logs').insertOne(l, { w: 0 }, null);
+  let c = collection(r, 'db.logs');
+  if (c) c.insertOne(l, { w: 0 }, null);
 }
