@@ -27,6 +27,8 @@ var libs = {
   responseFilter: require('./lib/response-filter'),
   user: require('./lib/user'),
   role: require('./lib/role'),
+  renewToken: require('./lib/renew-token'),
+  preprocess: require('./lib/preprocess'),
 };
 
 // config
@@ -78,6 +80,8 @@ var request: (req, res) => void = (() => {
       .do(libs.token)
       .flatMap<Request>(libs.user)
       .flatMap<Request>(libs.role)
+      .do(libs.renewToken)
+      .flatMap<Request>(libs.preprocess)
       .flatMap<Request>(libs.op)
       .flatMap<Request>(libs.responseFilter)
       .catch(r => Observable.of(r))

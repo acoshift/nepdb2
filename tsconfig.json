@@ -46,6 +46,8 @@
     "src/lib/op/role.ts",
     "src/lib/op/update.ts",
     "src/lib/op/user.ts",
+    "src/lib/preprocess.ts",
+    "src/lib/renew-token.ts",
     "src/lib/response-filter.ts",
     "src/lib/role.ts",
     "src/lib/token.ts",

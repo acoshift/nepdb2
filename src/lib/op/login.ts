@@ -1,22 +1,10 @@
 import { Request, Config } from '../../nepdb.d';
 import { Observable, Observer } from 'rxjs';
 import _ = require('lodash');
-import { canAccess, reject, collection, collectionName } from '../../utils';
+import { canAccess, reject, collection, collectionName, makeToken } from '../../utils';
 import httpStatus = require('http-status');
 import bcrypt = require('bcryptjs');
 import ms = require('ms');
-import jwt = require('jsonwebtoken');
-
-function makeToken(user: any, exp: string, config: Config): string {
-  return jwt.sign({
-    name: user.name,
-    ns: user.ns
-  }, config.token.secret, {
-    algorithm: config.token.algorithm,
-    expiresIn: exp || config.token.expiresIn,
-    issuer: config.token.issuer
-  });
-}
 
 export = function(r: Request): Observable<Request> {
   let nq = r.nq;

@@ -1,7 +1,9 @@
+import { Config } from './nepdb.d';
 import { ObjectID, Collection } from 'mongodb';
 import { Role, Request, ErrorResult } from './nepdb.d';
 import _ = require('lodash');
 import httpStatus = require('http-status');
+import jwt = require('jsonwebtoken');
 
 export function decode(input: string): string {
   return input ? new Buffer(input, 'base64').toString() : null;
@@ -61,4 +63,15 @@ export function collectionName(r: Request, ns?: string): string {
 
 export function collection(r: Request, ns?: string): Collection {
   return r.db.collection(collectionName(r, ns));
+}
+
+export function makeToken(user: any, exp: string, config: Config): string {
+  return jwt.sign({
+    name: user.name,
+    ns: user.ns
+  }, config.token.secret, {
+    algorithm: config.token.algorithm,
+    expiresIn: exp || config.token.expiresIn,
+    issuer: config.token.issuer
+  });
 }
