@@ -17,8 +17,9 @@
     "sourceMap": true
   },
   "filesGlob": [
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "typings/tsd.d.ts",
     "!node_modules/**"
   ],
   "compileOnSave": true,
@@ -46,20 +47,11 @@
     "src/lib/op/update.ts",
     "src/lib/op/user.ts",
     "src/lib/response-filter.ts",
+    "src/lib/role.ts",
     "src/lib/token.ts",
+    "src/lib/user.ts",
     "src/nepdb.d.ts",
     "src/utils.ts",
-    "typings/bcryptjs/bcryptjs.d.ts",
-    "typings/cookie-parser/cookie-parser.d.ts",
-    "typings/express/express.d.ts",
-    "typings/http-status/http-status.d.ts",
-    "typings/jsonwebtoken/jsonwebtoken.d.ts",
-    "typings/lodash/lodash.d.ts",
-    "typings/mime/mime.d.ts",
-    "typings/mongodb/mongodb.d.ts",
-    "typings/ms/ms.d.ts",
-    "typings/node/node.d.ts",
-    "typings/serve-static/serve-static.d.ts",
     "typings/tsd.d.ts"
   ],
   "atom": {

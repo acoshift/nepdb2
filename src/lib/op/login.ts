@@ -1,13 +1,21 @@
-import { Request, ReadOptions } from '../../nepdb.d';
+import { Request, Config } from '../../nepdb.d';
 import { Observable, Observer } from 'rxjs';
 import _ = require('lodash');
 import { canAccess, reject, collection, collectionName } from '../../utils';
 import httpStatus = require('http-status');
 import bcrypt = require('bcryptjs');
 import ms = require('ms');
+import jwt = require('jsonwebtoken');
 
-function makeToken(user: any, exp: string): string {
-  return '';
+function makeToken(user: any, exp: string, config: Config): string {
+  return jwt.sign({
+    name: user.name,
+    ns: user.ns
+  }, config.token.secret, {
+    algorithm: config.token.algorithm,
+    expiresIn: exp || config.token.expiresIn,
+    issuer: config.token.issuer
+  });
 }
 
 export = function(r: Request): Observable<Request> {
@@ -54,30 +62,37 @@ export = function(r: Request): Observable<Request> {
         name: d.name,
         ns: r.ns
       };
-      let token = makeToken(user, d.exp);
+      let token = makeToken(user, d.exp, r.config);
       r.res.cookie('token', token, {
-        maxAge: <number>(d.exp ? ms(d.exp) : ms(r.config.cookie.expiresIn)),
-        secure: true,
-        httpOnly: true
+        maxAge: <number>(d.exp ? ms(d.exp) : ms(r.config.cookie.maxAge)),
+        secure: r.config.cookie.secure,
+        httpOnly: r.config.cookie.httpOnly
       });
+      let _role = res.role;
       r.result = {
         token: token,
         user: res
       };
-      collection(r, 'db.roles').find({
-        $or: [
-          { _id: res.role },
-          { name: res.role }
-        ]
-      }).limit(1).next((err, res) => {
-        if (err) {
-          observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
+      r.result.user.role = ([resolve], nq, cb) => {
+        if (!resolve) {
+          cb(_role);
           return;
         }
-        if (res) r.result.user.role = res;
-        observer.next(r);
-        observer.complete();
-      });
+        collection(r, 'db.roles').find({
+          $or: [
+            { _id: _role },
+            { name: _role }
+          ]
+        }).limit(1).next((err, res) => {
+          if (err) {
+            cb(null);
+            return;
+          }
+          cb(res);
+        });
+      };
+      observer.next(r);
+      observer.complete();
     });
   });
 }

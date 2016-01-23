@@ -8,7 +8,6 @@ import _ = require('lodash');
 import { Observable } from 'rxjs';
 import { Request } from './nepdb.d';
 import { decode } from './utils';
-import httpStatus = require('http-status');
 
 // javascript import
 var compression = require('compression');
@@ -26,6 +25,8 @@ var libs = {
   token: require('./lib/token'),
   op: require('./lib/op'),
   responseFilter: require('./lib/response-filter'),
+  user: require('./lib/user'),
+  role: require('./lib/role'),
 };
 
 // config
@@ -70,13 +71,15 @@ var request: (req, res) => void = (() => {
       .of(createRequest(req, res))
       .do(r => r.timestamp.start = Date.now())
       .do(libs.ns)
+      .flatMap<Request>(libs.db)
+      .flatMap<Request>(libs.cors)
       .flatMap<Request>(libs.nq)
       .do(libs.alias)
       .do(libs.token)
-      .flatMap<Request>(libs.db)
-      .flatMap<Request>(libs.cors)
+      .flatMap<Request>(libs.user)
+      .flatMap<Request>(libs.role)
       .flatMap<Request>(libs.op)
-      .do(libs.responseFilter)
+      .flatMap<Request>(libs.responseFilter)
       .catch(r => Observable.of(r))
       .do(r => r.timestamp.end = Date.now())
       .do(libs.log)

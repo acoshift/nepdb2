@@ -1,21 +1,37 @@
 import { Request } from '../nepdb.d';
+import { Observable, Observer } from 'rxjs';
 import _ = require('lodash');
 import nepq = require('nepq');
-import { ObjectID } from 'mongodb';
+import { reject } from '../utils';
+import httpStatus = require('http-status');
 
-export = function(r: Request): void {
-  let f = x => {
-    if (_.isNull(x) || !_.isObject(x)) return;
-    _.forOwn(x, (v, k) => {
-      if (k === 'pwd' || k.substr(0, 2) === '__') {
-        delete x[k];
-        return;
-      }
-      if (_.isPlainObject(v) || _.isArray(v)) {
-        f(v);
-      }
-    });
-  };
-  f(r.result);
-  r.result = nepq.response(r.nq, r.result);
+export = function(r: Request): Observable<Request> {
+  return Observable.create((observer: Observer<Request>) => {
+    let f = x => {
+      if (_.isNull(x) || !_.isObject(x)) return;
+      _.forOwn(x, (v, k) => {
+        if (k === 'pwd' || k.substr(0, 2) === '__') {
+          delete x[k];
+          return;
+        }
+        if (_.isPlainObject(v) || _.isArray(v)) {
+          f(v);
+        }
+      });
+    };
+    f(r.result);
+    try {
+      nepq.response(r.nq, r.result, res => {
+        if (_.isUndefined(res)) {
+          observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, 'NepQ'));
+          return;
+        }
+        r.result = res;
+        observer.next(r);
+        observer.complete();
+      });
+    } catch(e) {
+      observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, 'NepQ', `[${e.name}]: ${e.message}`));
+    }
+  });
 }

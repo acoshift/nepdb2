@@ -3,6 +3,7 @@ import { Observable, Observer } from 'rxjs';
 import nepq = require('nepq');
 import { reject } from '../utils';
 import httpStatus = require('http-status');
+import _ = require('lodash');
 
 export = function(r: Request): Observable<Request> {
   if (r.req.get('content-type') !== 'application/nepq') {
@@ -15,6 +16,10 @@ export = function(r: Request): Observable<Request> {
       data.push(d);
     }).on('end', () => {
       r.nq = nepq.parse(Buffer.concat(data).toString('utf8'));
+      if (_.isNull(r.nq)) {
+        observer.error(reject(r, httpStatus.BAD_REQUEST, 'NepQ'));
+        return;
+      }
       observer.next(r);
       observer.complete();
     }).on('error', (err: Error) => {

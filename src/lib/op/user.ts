@@ -5,7 +5,7 @@ import { canAccess, reject, collection, objectId } from '../../utils';
 import httpStatus = require('http-status');
 
 export = function(r: Request): Observable<Request> {
-  if (r.user._id) return Observable.throw(reject(r, httpStatus.UNAUTHORIZED));
+  if (!r.user._id) return Observable.throw(reject(r, httpStatus.UNAUTHORIZED));
 
   return Observable.create((observer: Observer<Request>) => {
     collection(r, 'db.users').find({ _id: r.user._id }).limit(1).next((err, res) => {
@@ -18,20 +18,27 @@ export = function(r: Request): Observable<Request> {
         return;
       }
       r.result = res;
-      collection(r, 'db.roles').find({
-        $or: [
-          { _id: res.role },
-          { name: res.role }
-        ]
-      }).limit(1).next((err, res) => {
-        if (err) {
-          observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
+      let _role = res.role;
+      r.result.role = ([resolve], nq, cb) => {
+        if (!resolve) {
+          cb(_role);
           return;
         }
-        r.result.role = res;
-        observer.next(r);
-        observer.complete();
-      });
+        collection(r, 'db.roles').find({
+          $or: [
+            { _id: _role },
+            { name: _role }
+          ]
+        }).limit(1).next((err, res) => {
+          if (err) {
+            cb(null);
+            return;
+          }
+          cb(res);
+        });
+      };
+      observer.next(r);
+      observer.complete();
     });
   });
 }

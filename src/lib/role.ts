@@ -1,11 +1,11 @@
-import { Request } from '../../nepdb.d';
+import { Request } from '../nepdb.d';
 import { Observable, Observer } from 'rxjs';
 import _ = require('lodash');
-import { canAccess, reject, collection, objectId } from '../../utils';
-import httpStatus = require('http-status');
+import { collection } from '../utils';
+import jwt = require('jsonwebtoken');
 
 export = function(r: Request): Observable<Request> {
-  if (!r.user.role) return Observable.throw(reject(r, httpStatus.UNAUTHORIZED));
+  if (!r.user) return Observable.of(r);
 
   return Observable.create((observer: Observer<Request>) => {
     collection(r, 'db.roles').find({
@@ -14,11 +14,7 @@ export = function(r: Request): Observable<Request> {
         { name: r.user.role }
       ]
     }).limit(1).next((err, res) => {
-      if (err) {
-        observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
-        return;
-      }
-      r.result = res;
+      r.role = res.dbs;
       observer.next(r);
       observer.complete();
     });

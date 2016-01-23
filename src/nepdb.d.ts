@@ -18,8 +18,10 @@ export interface Config {
     level: number;
   };
   cookie: {
-    expiresIn: string;
+    maxAge: string;
     secret: string;
+    secure: boolean;
+    httpOnly: boolean;
   };
   token: {
     algorithm: string;
