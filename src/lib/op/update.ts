@@ -24,7 +24,7 @@ export = function(r: Request): Observable<Request> {
     $currentDate: { _update: true }
   };
 
-  let query: any = { _id: { $in: nq.params[0] } };
+  let query: any = { _id: nq.params[0] };
   if (access === 2) {
     query._owner = r.user._id;
   }
