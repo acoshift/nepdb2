@@ -1,13 +1,11 @@
 // typescript import
 import express = require('express');
-// import cookieParser = require('cookie-parser');
 import _ = require('lodash');
 import { Observable } from 'rxjs';
 import { Request, RSTokenSecret } from './nepdb.d';
 import { decode } from './utils';
 
 // javascript import
-// var compression = require('compression');
 var etag = require('etag');
 
 // libs import
@@ -23,10 +21,9 @@ var libs = {
   responseFilter: require('./lib/response-filter'),
   user: require('./lib/user'),
   role: require('./lib/role'),
-  // renewToken: require('./lib/renew-token'),
   preprocess: require('./lib/preprocess'),
   requestFilter: require('./lib/request-filter'),
-  fresh: require('./lib/fresh'),
+  responseFresh: require('./lib/response-fresh'),
 };
 
 // config
@@ -37,7 +34,6 @@ if (_.isString(config.token.secret)) {
   (<RSTokenSecret>config.token.secret).private = decode((<RSTokenSecret>config.token.secret).private);
   (<RSTokenSecret>config.token.secret).public = decode((<RSTokenSecret>config.token.secret).public);
 }
-// config.cookie.secret = decode(config.cookie.secret);
 config.server.port = config.server.port || 8000;
 
 var request: (req, res) => void = (() => {
@@ -82,11 +78,10 @@ var request: (req, res) => void = (() => {
       .do(libs.token)
       .flatMap<Request>(libs.user)
       .flatMap<Request>(libs.role)
-      // .do(libs.renewToken)
       .flatMap<Request>(libs.preprocess)
       .flatMap<Request>(libs.op)
       .flatMap<Request>(libs.responseFilter)
-      .do(libs.fresh)
+      .do(libs.responseFresh)
       .catch(r => Observable.of(r))
       .do(r => r.timestamp.end = Date.now())
       .do(libs.log)
@@ -98,10 +93,6 @@ var app = express();
 
 // app config
 app.set('etag', config.server.etag);
-
-// app.use(compression(config.compression));
-// app.use(cookieParser(config.cookie.secret));
-
 app.use(request);
 
 app.listen(config.server.port);
