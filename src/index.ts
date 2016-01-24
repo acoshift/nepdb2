@@ -6,11 +6,11 @@ import _ = require('lodash');
 // import jwt = require('jsonwebtoken');
 // import ms = require('ms');
 import { Observable } from 'rxjs';
-import { Request } from './nepdb.d';
+import { Request, RSTokenSecret } from './nepdb.d';
 import { decode } from './utils';
 
 // javascript import
-var compression = require('compression');
+// var compression = require('compression');
 var etag = require('etag');
 var fresh = require('fresh');
 
@@ -34,7 +34,12 @@ var libs = {
 
 // config
 import config = require('./config');
-config.token.secret = decode(config.token.secret);
+if (_.isString(config.token.secret)) {
+  config.token.secret = decode(<string>config.token.secret);
+} else {
+  (<RSTokenSecret>config.token.secret).private = decode((<RSTokenSecret>config.token.secret).private);
+  (<RSTokenSecret>config.token.secret).public = decode((<RSTokenSecret>config.token.secret).public);
+}
 config.cookie.secret = decode(config.cookie.secret);
 config.server.port = config.server.port || 8000;
 
@@ -66,7 +71,8 @@ var request: (req, res) => void = (() => {
       timestamp: {
         start: 0,
         end: 0
-      }
+      },
+      authorization: null
     };
   };
   return (req, res) => {
@@ -98,7 +104,7 @@ var app = express();
 // app config
 app.set('etag', config.server.etag);
 
-app.use(compression(config.compression));
+// app.use(compression(config.compression));
 app.use(cookieParser(config.cookie.secret));
 
 app.use(request);

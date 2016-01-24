@@ -1,12 +1,13 @@
-import { Request, Config } from '../../nepdb.d';
+import { Request, Config, User, Role } from '../../nepdb.d';
 import { Observable, Observer } from 'rxjs';
 import _ = require('lodash');
-import { canAccess, reject, collection, collectionName, makeToken } from '../../utils';
+import { canAccess, reject, collection, collectionName, makeToken, setTokenCookie } from '../../utils';
 import httpStatus = require('http-status');
 import bcrypt = require('bcryptjs');
 import ms = require('ms');
 
 export = function(r: Request): Observable<Request> {
+  if (!r.ns) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
   let nq = r.nq;
   let d;
   if (nq.params.length === 2 || nq.params.length === 3) {
@@ -33,54 +34,45 @@ export = function(r: Request): Observable<Request> {
   }
 
   return Observable.create((observer: Observer<Request>) => {
-    collection(r, 'db.users').find({ name: d.name }).limit(1).next((err, res) => {
+    collection(r, 'db.users').find({ name: d.name }).limit(1).next((err, user: User) => {
       if (err) {
         observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
         return;
       }
 
-      if (!res ||
-          !res.enabled ||
-          !res.pwd ||
-          !bcrypt.compareSync(d.pwd, res.pwd)) {
+      if (!user ||
+          user.name !== d.name ||
+          !user.enabled ||
+          !user.pwd ||
+          !bcrypt.compareSync(d.pwd, user.pwd)) {
         observer.error(reject(r, httpStatus.UNAUTHORIZED));
         return;
       }
-      let user = {
-        name: d.name,
-        ns: r.ns
-      };
-      let token = makeToken(user, d.exp, r.config);
-      r.res.cookie('token', token, {
-        maxAge: <number>(d.exp ? ms(d.exp) : ms(r.config.cookie.maxAge)),
-        secure: r.config.cookie.secure,
-        httpOnly: r.config.cookie.httpOnly
-      });
-      let _role = res.role;
-      r.result = {
-        token: token,
-        user: res
-      };
-      r.result.user.role = ([resolve], nq, cb) => {
-        if (!resolve) {
-          cb(_role);
+
+      let query: any = {};
+      if (_.isString(user.role)) {
+        query.name = user.role;
+      } else {
+        query._id = user.role;
+      }
+
+      collection(r, 'db.roles').find(query).limit(1).next((err, role) => {
+        if (err) {
+          observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
           return;
         }
-        collection(r, 'db.roles').find({
-          $or: [
-            { _id: _role },
-            { name: _role }
-          ]
-        }).limit(1).next((err, res) => {
-          if (err) {
-            cb(null);
-            return;
-          }
-          cb(res);
-        });
-      };
-      observer.next(r);
-      observer.complete();
+
+        let token = makeToken(r, user, role.dbs, d.exp);
+        setTokenCookie(r, token, d.exp);
+        user.role = role;
+        r.result = {
+          token: token,
+          user: user
+        };
+
+        observer.next(r);
+        observer.complete();
+      });
     });
   });
 }

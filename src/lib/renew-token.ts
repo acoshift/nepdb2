@@ -1,19 +1,16 @@
 import { Request } from '../nepdb.d';
 import _ = require('lodash');
-import { makeToken } from '../utils';
+import { makeToken, setTokenCookie } from '../utils';
 import ms = require('ms');
 
 export = function(r: Request): void {
-  let user = {
-    name: r.user.name,
-    ns: r.ns
-  };
-  let token = makeToken(user, null, r.config);
+  if (!r.authorization || !r.token) return;
+
+  let token = makeToken(r, r.user, r.role, null);
   if (!token) return;
-  if (r.req.get('authorization')) r.res.set('token', token);
-  r.res.cookie('token', token, {
-    maxAge: ms(r.config.cookie.maxAge),
-    secure: r.config.cookie.secure,
-    httpOnly: r.config.cookie.httpOnly
-  });
+  if (r.authorization === 'header') {
+    r.res.set('token', token);
+  } else if (r.authorization === 'cookie') {
+    setTokenCookie(r, token);
+  }
 }

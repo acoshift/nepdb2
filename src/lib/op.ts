@@ -16,7 +16,6 @@ var ops = {
   login: require('./op/login'),
   logout: require('./op/logout'),
   user: require('./op/user'),
-  role: require('./op/role'),
 }
 
 export = function(r: Request): Observable<Request> {

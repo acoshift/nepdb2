@@ -2,6 +2,11 @@ import express = require('express');
 import { Db, ObjectID } from 'mongodb';
 import { NepQ } from 'nepq';
 
+export interface RSTokenSecret {
+  private: string;
+  public: string;
+}
+
 export interface Config {
   server: {
     port: number;
@@ -27,7 +32,7 @@ export interface Config {
     algorithm: string;
     expiresIn: string;
     issuer: string;
-    secret: string;
+    secret: string | RSTokenSecret;
   };
   bcrypt: {
     cost: number;
@@ -42,7 +47,9 @@ export interface ErrorResult {
 export interface User {
   _id: ObjectID;
   name: string;
-  role: string;
+  role?: ObjectID | string;
+  enabled?: boolean;
+  pwd?: string;
 }
 
 export interface Role {
@@ -65,11 +72,22 @@ export interface Request {
   user: User;
   role: number | Role;
   nq: NepQ;
-  token: string;
+  token: Token;
   timestamp: RequestTimestamp;
+  authorization: string; // cookie, header
 }
 
-interface ReadOptions {
+export interface ReadOptions {
   limit?: number;
   skip?: number;
+}
+
+export interface Token {
+  id?: string; // undefined: self-signed
+  ns?: string; // undefined: *
+  name: string; // user.name
+  role: any; // role.dbs
+  issuer?: string;
+  iat?: number;
+  exp?: number;
 }

@@ -1,9 +1,18 @@
-import { Config } from './nepdb.d';
+import {
+  Config,
+  RSTokenSecret,
+  Token,
+  User,
+  Role,
+  Request,
+  ErrorResult
+} from './nepdb.d';
+
 import { ObjectID, Collection } from 'mongodb';
-import { Role, Request, ErrorResult } from './nepdb.d';
 import _ = require('lodash');
 import httpStatus = require('http-status');
 import jwt = require('jsonwebtoken');
+import ms = require('ms');
 
 export function decode(input: string): string {
   return input ? new Buffer(input, 'base64').toString() : null;
@@ -66,13 +75,46 @@ export function collection(r: Request, ns?: string): Collection {
   return r.db.collection(collectionName(r, ns));
 }
 
-export function makeToken(user: any, exp: string, config: Config): string {
-  return jwt.sign({
+export function getTokenSecret(config: Config, pub?: boolean): string {
+  let secret: string = null;
+  if (_.isString(config.token.secret)) {
+    secret = <string>config.token.secret;
+  } else {
+    if (pub === true) {
+      secret = (<RSTokenSecret>config.token.secret).public;
+    } else {
+      secret = (<RSTokenSecret>config.token.secret).private;
+    }
+  }
+  return secret;
+}
+
+export function makeToken(r: Request, user: User, role: number | Role, exp: string): string {
+  if (!user || !user._id) return null; // do not make token for self-signed
+  
+  let config = r.config;
+  let secret: string = getTokenSecret(config);
+
+  let opt: any = {
+    algorithm: config.token.algorithm
+  };
+  if (config.token.issuer) opt.issuer = config.token.issuer;
+  if (exp || config.token.expiresIn) opt.expiresIn = exp || config.token.expiresIn;
+
+  let obj: Token = {
+    id: user._id.toHexString(),
+    ns: r.ns,
     name: user.name,
-    ns: user.ns
-  }, config.token.secret, {
-    algorithm: config.token.algorithm,
-    expiresIn: exp || config.token.expiresIn,
-    issuer: config.token.issuer
+    role: role
+  };
+
+  return jwt.sign(obj, secret, opt);
+}
+
+export function setTokenCookie(r: Request, token: string, exp?: string) {
+  r.res.cookie('token', token, {
+    maxAge: <number>(exp ? ms(exp) : ms(r.config.cookie.maxAge)),
+    secure: r.config.cookie.secure,
+    httpOnly: r.config.cookie.httpOnly
   });
 }

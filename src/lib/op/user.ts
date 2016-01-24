@@ -20,7 +20,7 @@ export = function(r: Request): Observable<Request> {
       r.result = res;
       let _role = res.role;
       r.result.role = ([resolve], nq, cb) => {
-        if (!resolve) {
+        if (resolve !== true && resolve !== 1) {
           cb(_role);
           return;
         }
