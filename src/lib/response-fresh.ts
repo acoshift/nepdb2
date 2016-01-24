@@ -7,7 +7,7 @@ var etag = require('etag');
 export = function(r: Request): void {
   let { req, res, result } = r;
   if (fresh(req.headers, { etag: etag(JSON.stringify(result)) })) {
-    r.status = httpStatus.NO_CONTENT;
+    r.status = httpStatus.NOT_MODIFIED;
     r.result = undefined;
   }
 }
