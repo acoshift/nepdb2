@@ -74,7 +74,6 @@ export interface Request {
   nq: NepQ;
   token: Token;
   timestamp: RequestTimestamp;
-  authorization: string; // cookie, header
 }
 
 export interface ReadOptions {

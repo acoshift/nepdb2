@@ -10,8 +10,10 @@ export = function(r: Request): void {
       method: r.nq.method,
       name: r.nq.name
     } : null,
-    status: r.status
+    status: r.status,
+    time: r.timestamp.end - r.timestamp.start
   };
   let c = collection(r, 'db.logs');
   if (c) c.insertOne(l, { w: 0 }, null);
+  // console.log(JSON.stringify(l));
 }

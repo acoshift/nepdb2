@@ -23,8 +23,6 @@
   "homepage": "https://github.com/acoshift/nepdb2#readme",
   "dependencies": {
     "bcryptjs": "^2.3.0",
-    "compression": "^1.6.1",
-    "cookie-parser": "^1.4.1",
     "etag": "^1.7.0",
     "express": "^5.0.0-alpha.2",
     "fresh": "^0.3.0",

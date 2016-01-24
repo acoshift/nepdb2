@@ -14,7 +14,7 @@ var ops = {
   count: require('./op/count'),
   list: require('./op/list'),
   login: require('./op/login'),
-  logout: require('./op/logout'),
+  // logout: require('./op/logout'),
   user: require('./op/user'),
 }
 
