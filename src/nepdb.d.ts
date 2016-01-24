@@ -19,15 +19,6 @@ export interface Config {
     port: number;
     maxPoolSize: number;
   };
-  compression: {
-    level: number;
-  };
-  cookie: {
-    maxAge: string;
-    secret: string;
-    secure: boolean;
-    httpOnly: boolean;
-  };
   token: {
     algorithm: string;
     expiresIn: string;
