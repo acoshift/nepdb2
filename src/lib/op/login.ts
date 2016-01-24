@@ -33,6 +33,8 @@ export = function(r: Request): Observable<Request> {
     return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
   }
 
+  r.user.name += ' => ' + d.name;
+
   return Observable.create((observer: Observer<Request>) => {
     collection(r, 'db.users').find({ name: d.name }).limit(1).next((err, user: User) => {
       if (err) {
