@@ -96,7 +96,9 @@ var request: (req, res) => void = (() => {
 var app = express();
 
 // app config
+app.disable('x-powered-by');
 app.set('etag', config.server.etag);
+
 app.use(request);
 
 app.listen(config.server.port);

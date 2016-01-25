@@ -39,7 +39,6 @@
     "src/lib/op/delete.ts",
     "src/lib/op/list.ts",
     "src/lib/op/login.ts",
-    "src/lib/op/logout.ts",
     "src/lib/op/query.ts",
     "src/lib/op/read.ts",
     "src/lib/op/restore.ts",
