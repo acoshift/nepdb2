@@ -7,7 +7,7 @@ import httpStatus = require('http-status');
 export = function(r: Request): Observable<Request> {
   let access = canAccess(r, 'r');
   if (access === 0) return Observable.throw(reject(r, httpStatus.UNAUTHORIZED));
-  if (access === 2 && !r.user._id) return Observable.throw(reject(r, httpStatus.UNAUTHORIZED));
+  if (access === 2 && !(r.user._id || r.user.name)) return Observable.throw(reject(r, httpStatus.UNAUTHORIZED));
 
   let nq = r.nq;
 
