@@ -85,6 +85,7 @@ var request: (req, res) => void = (() => {
       .catch(r => Observable.of(r))
       .do(r => r.timestamp.end = Date.now())
       .do(libs.log)
+      .catch(r => Observable.of(r))
       .subscribe(r => response(r));
   };
 })();
