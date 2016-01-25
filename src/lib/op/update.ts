@@ -17,7 +17,7 @@ export = function(r: Request): Observable<Request> {
   let query: any;
   if (_.isString(nq.params[0])) {
     let objId = objectId(nq.params[0]);
-    if (objId) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
+    if (!objId) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
     query = { _id: objId };
   } else if (_.isArray(nq.params[0])) {
     let params = _(nq.params).map(objectId).filter(x => !!x).value();
