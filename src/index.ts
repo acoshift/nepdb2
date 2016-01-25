@@ -103,9 +103,3 @@ app.use(request);
 
 app.listen(config.server.port);
 console.log(`Server listening on port ${config.server.port}`);
-
-process.on('uncaughtException', (err: Error) => {
-  console.error(err.stack);
-  // TODO: send error to developer
-  process.exit(1);
-});
