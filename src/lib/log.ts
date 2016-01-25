@@ -4,7 +4,7 @@ import { collection } from '../utils';
 export = function(r: Request): void {
   let l = {
     ns: r.ns,
-    user: r.user && r.user._id || r.user.name || null,
+    user: r.user && (r.user._id || r.user.name) || null,
     nq: r.nq ? {
       method: r.nq.method,
       name: r.nq.name
