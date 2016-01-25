@@ -15,7 +15,7 @@ export = function(r: Request): Observable<Request> {
   let x = nq.params[0];
 
   if (access === 2) {
-    x._owner = r.user._id;
+    x._owner = r.user._id || r.user.name;
   }
 
   return Observable.create((observer: Observer<Request>) => {

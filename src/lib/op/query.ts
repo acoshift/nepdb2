@@ -25,7 +25,7 @@ export = function(r: Request): Observable<Request> {
   };
 
   if (access === 2) {
-    x._owner = r.user._id;
+    x._owner = r.user._id || r.user.name;
   }
 
   return Observable.create((observer: Observer<Request>) => {

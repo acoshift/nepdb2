@@ -12,9 +12,9 @@ export = function(r: Request): Observable<Request> {
   if (!_.every(nq.params, _.isPlainObject)) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
 
   // add owner to object if empty
-  if (r.user._id) {
+  if (r.user._id || r.user.name) {
     _.forEach(nq.params, x => {
-      if (!x._owner) x._owner = r.user._id;
+      if (!x._owner) x._owner = r.user._id || r.user.name;
     });
   }
 

@@ -17,7 +17,7 @@ export = function(r: Request): Observable<Request> {
 
   let query: any = { _id: { $in: params } };
   if (access === 2) {
-    query._owner = r.user._id;
+    query._owner = r.user._id || r.user.name;
   }
 
   return Observable.create((observer: Observer<Request>) => {

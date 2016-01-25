@@ -19,7 +19,7 @@ export = function(r: Request): Observable<Request> {
 
   let query: any = { _id: { $in: params } };
   if (access === 2) {
-    query._owner = r.user._id;
+    query._owner = r.user._id || r.user.name;
   }
 
   return Observable.create((observer: Observer<Request>) => {
@@ -29,7 +29,7 @@ export = function(r: Request): Observable<Request> {
     let movedId = [];
     cursor.forEach(x => {
       let doc: any = { db: ns, data: x };
-      if (r.user._id) doc._owner = r.user._id;
+      if (r.user._id || r.user.name) doc._owner = r.user._id || r.user.name;
       batch.insert(doc);
       movedId.push(x._id);
     }, () => {
