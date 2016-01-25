@@ -1,7 +1,7 @@
 import { Request, Config, User, Role } from '../../nepdb.d';
 import { Observable, Observer } from 'rxjs';
 import _ = require('lodash');
-import { canAccess, reject, collection, collectionName, makeToken, setTokenCookie } from '../../utils';
+import { reject, collection, makeToken } from '../../utils';
 import httpStatus = require('http-status');
 import bcrypt = require('bcryptjs');
 import ms = require('ms');

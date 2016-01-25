@@ -5,7 +5,7 @@ import { canAccess, reject, collection } from '../../utils';
 import httpStatus = require('http-status');
 
 export = function(r: Request): Observable<Request> {
-  if (canAccess(r.role, 'c', r.ns) === 0) return Observable.throw(reject(r, httpStatus.UNAUTHORIZED));
+  if (canAccess(r, 'c') === 0) return Observable.throw(reject(r, httpStatus.UNAUTHORIZED));
 
   let nq = r.nq;
   if (_.isEmpty(nq.params)) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));

@@ -1,7 +1,7 @@
 import { Request } from '../../nepdb.d';
 import { Observable, Observer } from 'rxjs';
 import _ = require('lodash');
-import { canAccess, reject, collection, objectId } from '../../utils';
+import { reject, collection, objectId } from '../../utils';
 import httpStatus = require('http-status');
 
 export = function(r: Request): Observable<Request> {

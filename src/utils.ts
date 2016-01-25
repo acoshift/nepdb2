@@ -34,7 +34,10 @@ export function json(input: string) {
   }
 }
 
-export function canAccess(role: number | Role, group: string, ns: string): number {
+export function canAccess(r: Request, group: string, ns?: string): number {
+  let role = r.role;
+  ns = collectionName(r, ns);
+
   if (_.isNull(role)) return 0;
   if (_.isFinite(role)) return <number>role;
   if (_.isFinite(role['*'])) return <number>role['*'];
