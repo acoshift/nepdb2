@@ -26,23 +26,42 @@ export = function(r: Request): Observable<Request> {
     let ns = collectionName(r);
     let cursor = collection(r).find(query);
     let batch = collection(r, 'db.trash').initializeUnorderedBulkOp(null);
+    let movedId = [];
     cursor.forEach(x => {
-      batch.insert({ db: ns, data: x, _owner: r.user._id || undefined });
-    }, null);
-    batch.execute((err, res) => {
-      if (err) {
-        observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
-        return;
-      }
-      collection(r).deleteMany(query, (err, res) => {
-        if (err) {
-          observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
-          return;
-        }
-        r.result = res;
+      let doc: any = { db: ns, data: x };
+      if (r.user._id) doc._owner = r.user._id;
+      batch.insert(doc);
+      movedId.push(x._id);
+    }, () => {
+      try {
+        batch.execute((err, res) => {
+          if (err) {
+            observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
+            return;
+          }
+          let query: any = { _id: { $in: movedId } };
+          collection(r).deleteMany(query, (err, res) => {
+            if (err) {
+              observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
+              return;
+            }
+            if (res) {
+              if (res.connection) res.connection = undefined;
+            }
+            r.result = res;
+            observer.next(r);
+            observer.complete();
+          });
+        });
+      } catch(e) {
+        // bulk with no operation
+        r.result = {
+          ok: 1,
+          n: 0
+        };
         observer.next(r);
         observer.complete();
-      });
+      }
     });
   });
 }

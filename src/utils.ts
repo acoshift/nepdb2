@@ -91,7 +91,7 @@ export function getTokenSecret(config: Config, pub?: boolean): string {
 
 export function makeToken(r: Request, user: User, role: number | Role, exp: string): string {
   if (!user || !user._id) return null; // do not make token for self-signed
-  
+
   let config = r.config;
   let secret: string = getTokenSecret(config);
 
@@ -110,7 +110,7 @@ export function makeToken(r: Request, user: User, role: number | Role, exp: stri
 
   return jwt.sign(obj, secret, opt);
 }
-
+/*
 export function setTokenCookie(r: Request, token: string, exp?: string) {
   r.res.cookie('token', token, {
     maxAge: <number>(exp ? ms(exp) : ms(r.config.cookie.maxAge)),
@@ -118,3 +118,4 @@ export function setTokenCookie(r: Request, token: string, exp?: string) {
     httpOnly: r.config.cookie.httpOnly
   });
 }
+*/

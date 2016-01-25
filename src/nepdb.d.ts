@@ -18,6 +18,7 @@ export interface Config {
     host: string;
     port: number;
     maxPoolSize: number;
+    authSource: string;
   };
   token: {
     algorithm: string;

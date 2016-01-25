@@ -32,6 +32,9 @@ export = function(r: Request): Observable<Request> {
         observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
         return;
       }
+      if (res) {
+        if (res.connection) res.connection = undefined;
+      }
       r.result = res;
       observer.next(r);
       observer.complete();
