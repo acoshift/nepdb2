@@ -12,25 +12,33 @@ export = function(r: Request): Observable<Request> {
   let nq = r.nq;
 
   if (nq.params.length !== 2 ||
-      !_.isString(nq.params[0]) ||
       !_.isPlainObject(nq.params[1])) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
 
-  nq.params[0] = objectId(nq.params[0]);
-
-  if (!nq.params[0]) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
+  let query: any;
+  if (_.isString(nq.params[0])) {
+    let objId = objectId(nq.params[0]);
+    if (objId) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
+    query = { _id: objId };
+  } else if (_.isArray(nq.params[0])) {
+    let params = _(nq.params).map(objectId).filter(x => !!x).value();
+    query = { _id: { $in: params } };
+  } else if (_.isPlainObject(nq.params[0])) {
+    query = nq.params[0];
+  } else {
+    return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
+  }
 
   let doc = {
     $set: nq.params[1],
     $currentDate: { _update: true }
   };
 
-  let query: any = { _id: nq.params[0] };
   if (access === 2) {
     query._owner = r.user._id || r.user.name;
   }
 
   return Observable.create((observer: Observer<Request>) => {
-    collection(r).updateOne(query, doc, (err, res) => {
+    collection(r).updateMany(query, doc, (err, res) => {
       if (err) {
         observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
       } else {
