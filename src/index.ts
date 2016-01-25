@@ -4,6 +4,7 @@ import _ = require('lodash');
 import { Observable } from 'rxjs';
 import { Request, RSTokenSecret } from './nepdb.d';
 import { decode } from './utils';
+import httpStatus = require('http-status');
 
 // javascript import
 var etag = require('etag');
@@ -38,12 +39,14 @@ config.server.port = config.server.port || 8000;
 
 var request: (req, res) => void = (() => {
   let response = (r: Request) => {
-    r.res.status(r.status);
-    if (_.isUndefined(r.result)) {
-      r.res.end();
-    } else {
-      r.res.json(r.result);
-    }
+    try {
+      r.res.status(r.status);
+      if (_.isUndefined(r.result)) {
+        r.res.end();
+      } else {
+        r.res.json(r.result);
+      }
+    } catch(e) {}
   };
 
   let createRequest = (req, res): Request => {
