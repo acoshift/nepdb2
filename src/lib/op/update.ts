@@ -11,9 +11,15 @@ export = function(r: Request): Observable<Request> {
 
   let nq = r.nq;
 
-  if (!(nq.params.length === 2 || nq.params.length === 3) ||
-      !_.isPlainObject(nq.params[1]) ||
-      (nq.params[2] && !_.isArray(nq.params[2]))) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
+  try {
+    if (nq.params.length === 2) {
+      if (_.isNull(nq.params[1])) throw null;
+      if (!_.isPlainObject(nq.params[1])) throw null;
+    } else if (nq.params.length === 3) {
+      if (!_.isNull(nq.params[1]) && !_.isPlainObject(nq.params[1])) throw null;
+      if (!_.isNull(nq.params[2]) && !_.isArray(nq.params[2])) throw null;
+    } else { throw null; }
+  } catch(e) { return Observable.throw(reject(r, httpStatus.BAD_REQUEST)); }
 
   let query: any;
   if (_.isString(nq.params[0])) {
@@ -37,7 +43,7 @@ export = function(r: Request): Observable<Request> {
     doc.$set = nq.params[1];
   }
 
-  if (nq.params[2] && !_.isEmpty(nq.params[2])) {
+  if (!_.isEmpty(nq.params[2])) {
     doc.$unset = {};
     _.forEach(nq.params[2], x => {
       doc.$unset[x] = "";
