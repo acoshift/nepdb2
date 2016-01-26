@@ -45,8 +45,8 @@ export = function(r: Request): Observable<Request> {
       if (!user ||
           user.name !== d.name ||
           !user.enabled ||
-          !user.pwd ||
-          !bcrypt.compareSync(d.pwd, user.pwd)) {
+          !user.__pwd ||
+          !bcrypt.compareSync(d.pwd, user.__pwd)) {
         observer.error(reject(r, httpStatus.UNAUTHORIZED));
         return;
       }

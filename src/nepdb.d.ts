@@ -41,7 +41,7 @@ export interface User {
   name: string;
   role?: ObjectID | string;
   enabled?: boolean;
-  pwd?: string;
+  __pwd?: string;
 }
 
 export interface Role {

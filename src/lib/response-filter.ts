@@ -10,7 +10,7 @@ export = function(r: Request): Observable<Request> {
     let f = x => {
       if (_.isNull(x) || !_.isObject(x)) return;
       _.forOwn(x, (v, k) => {
-        if (k === 'pwd' || k.substr(0, 2) === '__') {
+        if (k.startsWith('__')) {
           delete x[k];
           return;
         }

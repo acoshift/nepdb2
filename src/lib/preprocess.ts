@@ -30,6 +30,8 @@ function preprocess(param, config: Config): void {
       if (p) delete a[k];
     } else if (k === '_id') {
       a[k] = objectId(v);
+    } else if (k === '__pwd') {
+      a[k] = bcrypt.hashSync(v, config.bcrypt.cost);
     }
   });
 }
