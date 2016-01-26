@@ -11,8 +11,9 @@ export = function(r: Request): Observable<Request> {
 
   let nq = r.nq;
 
-  if (nq.params.length !== 2 ||
-      !_.isPlainObject(nq.params[1])) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
+  if (!(nq.params.length === 2 || nq.params.length === 3) ||
+      !_.isPlainObject(nq.params[1]) ||
+      (nq.params[2] && !_.isArray(nq.params[2]))) return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
 
   let query: any;
   if (_.isString(nq.params[0])) {
@@ -28,10 +29,20 @@ export = function(r: Request): Observable<Request> {
     return Observable.throw(reject(r, httpStatus.BAD_REQUEST));
   }
 
-  let doc = {
-    $set: nq.params[1],
+  let doc: any = {
     $currentDate: { _update: true }
   };
+
+  if (!_.isEmpty(nq.params[1])) {
+    doc.$set = nq.params[1];
+  }
+
+  if (nq.params[2] && !_.isEmpty(nq.params[2])) {
+    doc.$unset = {};
+    _.forEach(nq.params[2], x => {
+      doc.$unset[x] = "";
+    });
+  }
 
   if (access === 2) {
     query._owner = r.user._id || r.user.name;
