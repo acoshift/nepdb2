@@ -5,21 +5,24 @@ import nepq = require('nepq');
 import { reject } from '../utils';
 import httpStatus = require('http-status');
 
+function f(x) {
+  if (_.isNull(x) || !_.isObject(x)) return;
+  _.forOwn(x, (v, k) => {
+    // remove private field
+    if (k.startsWith('__')) {
+      delete x[k];
+      return;
+    }
+    if (_.isPlainObject(v) || _.isArray(v)) {
+      f(v);
+    }
+  });
+}
+
 export = function(r: Request): Observable<Request> {
   return Observable.create((observer: Observer<Request>) => {
-    let f = x => {
-      if (_.isNull(x) || !_.isObject(x)) return;
-      _.forOwn(x, (v, k) => {
-        if (k.startsWith('__')) {
-          delete x[k];
-          return;
-        }
-        if (_.isPlainObject(v) || _.isArray(v)) {
-          f(v);
-        }
-      });
-    };
     f(r.result);
+
     try {
       nepq.response(r.nq, r.result, res => {
         if (_.isUndefined(res)) {

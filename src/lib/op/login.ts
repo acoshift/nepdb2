@@ -65,7 +65,6 @@ export = function(r: Request): Observable<Request> {
         }
 
         let token = makeToken(r, user, role.dbs, d.exp);
-        // setTokenCookie(r, token, d.exp);
         user.role = role;
         r.result = {
           token: token,
