@@ -21,14 +21,4 @@ export = function(r: Request): Observable<Request> {
   }
 
   return Observable.of(r);
-/*
-  // TODO: remove this for stateless
-  return Observable.create((observer: Observer<Request>) => {
-    collection(r, 'db.users').find({ name: profile.name }).limit(1).next((err, res) => {
-      r.user = res;
-      observer.next(r);
-      observer.complete();
-    });
-  });
-*/
 }
