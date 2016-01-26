@@ -37,6 +37,9 @@
     },
     "http-status/http-status.d.ts": {
       "commit": "2cad4a3cff770c37b40496188c246b1a60e87e2d"
+    },
+    "es6-shim/es6-shim.d.ts": {
+      "commit": "46719185c564694c5583c4b7ad94dbb786ecad46"
     }
   }
 }
