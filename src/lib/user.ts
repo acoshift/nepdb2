@@ -12,6 +12,7 @@ export = function(r: Request): Observable<Request> {
   };
 
   let p = r.token;
+  if (p && p.ns && p.ns !== r.ns && p.name) r.user.name = p.name + ' => ' + r.user.name;
   if (!p || (!_.isUndefined(p.ns) && p.ns !== r.ns)) return Observable.of(r);
 
   r.user = {

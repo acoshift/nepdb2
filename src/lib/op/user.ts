@@ -5,9 +5,18 @@ import { reject, collection, objectId } from '../../utils';
 import httpStatus = require('http-status');
 
 export = function(r: Request): Observable<Request> {
-  if (!r.user._id) return Observable.throw(reject(r, httpStatus.UNAUTHORIZED));
-
   return Observable.create((observer: Observer<Request>) => {
+    // guest or self-signed
+    if (!r.user._id) {
+      r.result = {
+        name: r.user.name,
+        role: r.role
+      }
+      observer.next(r);
+      observer.complete();
+      return;
+    }
+
     collection(r, 'db.users').find({ _id: r.user._id }).limit(1).next((err, res) => {
       if (err) {
         observer.error(reject(r, httpStatus.INTERNAL_SERVER_ERROR, err.name, err.message));
@@ -24,12 +33,14 @@ export = function(r: Request): Observable<Request> {
           cb(_role);
           return;
         }
-        collection(r, 'db.roles').find({
-          $or: [
-            { _id: _role },
-            { name: _role }
-          ]
-        }).limit(1).next((err, res) => {
+
+        let query: any = {};
+        if (_.isString(_role)) {
+          query.name = _role;
+        } else {
+          query._id = _role;
+        }
+        collection(r, 'db.roles').find(query).limit(1).next((err, res) => {
           if (err) {
             cb(null);
             return;
@@ -37,6 +48,7 @@ export = function(r: Request): Observable<Request> {
           cb(res);
         });
       };
+
       observer.next(r);
       observer.complete();
     });

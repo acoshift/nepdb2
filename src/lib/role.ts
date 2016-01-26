@@ -5,7 +5,7 @@ import { collection } from '../utils';
 
 export = function(r: Request): Observable<Request> {
   // try to get role from token first
-  if (r.token && r.token.role) {
+  if (r.token && (!r.token.ns || r.token.ns === r.ns) && r.token.role) {
     r.role = r.token.role;
     return Observable.of(r);
   }
