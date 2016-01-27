@@ -1,54 +1,19 @@
-// typescript import
-import express = require('express');
-import _ = require('lodash');
-import { Observable } from 'rxjs';
-import { Request, RSTokenSecret } from './nepdb.d';
-import { decode } from './utils';
-import httpStatus = require('http-status');
+import * as express from 'express'
+import { Observable } from 'rxjs'
+import * as _ from 'lodash'
+import { Request } from './nepdb.d'
+import libs from './libs'
+import config from './config'
 
-// javascript import
-var etag = require('etag');
+config.server.port = config.server.port || 8000
 
-// libs import
-var libs = {
-  cors: require('./lib/cors'),
-  db: require('./lib/db'),
-  ns: require('./lib/ns'),
-  nq: require('./lib/nq'),
-  log: require('./lib/log'),
-  alias: require('./lib/alias'),
-  token: require('./lib/token'),
-  op: require('./lib/op'),
-  responseFilter: require('./lib/response-filter'),
-  user: require('./lib/user'),
-  role: require('./lib/role'),
-  preprocess: require('./lib/preprocess'),
-  requestFilter: require('./lib/request-filter'),
-  responseFresh: require('./lib/response-fresh'),
-};
+const app = express()
+app.disable('x-powered-by')
+app.set('etag', config.server.etag)
+app.use(request)
+app.listen(config.server.port)
 
-// config
-import config = require('./config');
-if (_.isString(config.token.secret)) {
-  config.token.secret = decode(<string>config.token.secret);
-} else {
-  (<RSTokenSecret>config.token.secret).private = decode((<RSTokenSecret>config.token.secret).private);
-  (<RSTokenSecret>config.token.secret).public = decode((<RSTokenSecret>config.token.secret).public);
-}
-config.server.port = config.server.port || 8000;
-
-var app = express();
-
-// app config
-app.disable('x-powered-by');
-app.set('etag', config.server.etag);
-
-app.use(request);
-
-app.listen(config.server.port);
-console.log(`Server listening on port ${config.server.port}`);
-
-function createRequest(req, res): Request {
+function createRequest (req, res): Request {
   return {
     req: req,
     res: res,
@@ -65,21 +30,21 @@ function createRequest(req, res): Request {
       start: 0,
       end: 0
     }
-  };
+  }
 }
 
-function response(r: Request) {
+function response (r: Request): void {
   try {
-    r.res.status(r.status);
+    r.res.status(r.status)
     if (_.isUndefined(r.result)) {
-      r.res.end();
+      r.res.end()
     } else {
-      r.res.json(r.result);
+      r.res.json(r.result)
     }
-  } catch(e) {}
+  } catch (e) {}
 }
 
-function request(req, res): void {
+function request (req, res): void {
   Observable
     .of(createRequest(req, res))
     .do(r => r.timestamp.start = Date.now())
@@ -100,5 +65,5 @@ function request(req, res): void {
     .do(r => r.timestamp.end = Date.now())
     .do(libs.log)
     .catch(r => Observable.of(r))
-    .subscribe(r => response(r));
+    .subscribe(r => response(r))
 }

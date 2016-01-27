@@ -1,13 +1,12 @@
-import { Request } from '../nepdb.d';
-import _ = require('lodash');
-import httpStatus = require('http-status');
-var fresh = require('fresh');
-var etag = require('etag');
+import { Request } from '../nepdb.d'
+import { NOT_MODIFIED } from 'http-status'
+import * as fresh from 'fresh'
+import * as etag from 'etag'
 
-export = function(r: Request): void {
-  let { req, res, result } = r;
+export default function (r: Request): void {
+  let { req, result } = r
   if (fresh(req.headers, { etag: etag(JSON.stringify(result)) })) {
-    r.status = httpStatus.NOT_MODIFIED;
-    r.result = undefined;
+    r.status = NOT_MODIFIED
+    r.result = undefined
   }
 }

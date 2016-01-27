@@ -1,27 +1,35 @@
-import { Request } from '../nepdb.d';
-import { Observable } from 'rxjs';
-import _ = require('lodash');
-import { reject } from '../utils';
-import httpStatus = require('http-status');
+import { Request } from '../nepdb.d'
+import { Observable } from 'rxjs'
+import { reject } from '../utils'
+import { NOT_IMPLEMENTED } from 'http-status'
 
-var ops = {
-  create: require('./op/create'),
-  read: require('./op/read'),
-  update: require('./op/update'),
-  delete: require('./op/delete'),
-  query: require('./op/query'),
-  restore: require('./op/restore'),
-  count: require('./op/count'),
-  list: require('./op/list'),
-  login: require('./op/login'),
-  user: require('./op/user'),
+// ops import
+import create from './op/create'
+import read from './op/read'
+import update from './op/update'
+import delete1 from './op/delete'
+import query from './op/query'
+import restore from './op/restore'
+import count from './op/count'
+import list from './op/list'
+import login from './op/login'
+import user from './op/user'
+
+const ops = {
+  create: create,
+  read: read,
+  update: update,
+  delete: delete1,
+  query: query,
+  restore: restore,
+  count: count,
+  list: list,
+  login: login,
+  user: user,
 }
 
-export = function(r: Request): Observable<Request> {
-  let op = ops[r.nq.method];
-  if (op) {
-    return op(r);
-  }
-
-  return Observable.throw(reject(r, httpStatus.NOT_IMPLEMENTED));
+export default function (r: Request): Observable<Request> {
+  let op = ops[r.nq.method]
+  if (op) return op(r)
+  return Observable.throw(reject(r, NOT_IMPLEMENTED))
 }

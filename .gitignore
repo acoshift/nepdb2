@@ -1,5 +1,5 @@
 node_modules/
-typings/
+typings/**
 **/*.map
 dist/
 build/

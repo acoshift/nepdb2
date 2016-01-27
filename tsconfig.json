@@ -51,7 +51,10 @@
     "src/lib/role.ts",
     "src/lib/token.ts",
     "src/lib/user.ts",
+    "src/libs.ts",
     "src/nepdb.d.ts",
+    "src/typings/etag.d.ts",
+    "src/typings/fresh.d.ts",
     "src/utils.ts",
     "typings/tsd.d.ts"
   ],

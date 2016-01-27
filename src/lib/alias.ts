@@ -1,6 +1,6 @@
-import { Request } from '../nepdb.d';
+import { Request } from '../nepdb.d'
 
-var alias = {
+const alias = {
   c: 'create',
   r: 'read',
   u: 'update',
@@ -13,10 +13,10 @@ var alias = {
   lo: 'logout',
   ui: 'user',
   ur: 'role',
-};
+}
 
-export = function(r: Request): void {
-  if (r.nq.method === '') return;
-  let m = alias[r.nq.method];
-  if (m) r.nq.method = m;
+export default function (r: Request): void {
+  if (r.nq.method === '') return
+  let m = alias[r.nq.method]
+  if (m) r.nq.method = m
 }
