@@ -1,6 +1,7 @@
 import { Request } from '../../nepdb.d'
 import { Observable, Observer } from 'rxjs'
 import { reject, collection } from '../../utils'
+import * as _ from 'lodash'
 import { NOT_FOUND, INTERNAL_SERVER_ERROR } from 'http-status'
 
 export default function (r: Request): Observable<Request> {
