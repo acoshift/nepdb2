@@ -4,6 +4,12 @@ import * as _ from 'lodash'
 import { canAccess, reject, collection, objectId } from '../../utils'
 import { UNAUTHORIZED, BAD_REQUEST, INTERNAL_SERVER_ERROR } from 'http-status'
 
+const reserve = [
+  '_id',
+  '_update',
+  '__pwd'
+]
+
 export default function (r: Request): Observable<Request> {
   let access = canAccess(r, 'u')
   if (access === 0) return Observable.throw(reject(r, UNAUTHORIZED))
@@ -18,6 +24,7 @@ export default function (r: Request): Observable<Request> {
     } else if (nq.params.length === 3) {
       if (nq.params[1] != null && !_.isPlainObject(nq.params[1])) throw null
       if (nq.params[2] != null && !_.isArray(nq.params[2])) throw null
+      if (_.some(nq.params[2], x => _.include(reserve, x))) throw null
     } else { throw null }
   } catch (e) { return Observable.throw(reject(r, BAD_REQUEST)) }
 
