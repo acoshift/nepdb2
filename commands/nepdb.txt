@@ -1,0 +1,48 @@
+// NepDB New Namespace
+use ns
+
+// Users
+db.db.users.createIndex({ name: 1 }, { unique: true })
+
+// Roles
+db.db.roles.createIndex({ name: 1}, { unique: true })
+
+// Logs
+// Size: 10 MB => 10,000,000 Bytes
+db.createCollection("db.logs", { capped: true, size: 10000000 })
+db.runCommand({"convertToCapped": "db.logs", size: 10000000})
+
+// Trash
+// Size: 100 MB => 100,000,000 Bytes
+db.createCollection("db.trash", { capped: true, size: 100000000 })
+db.runCommand({"convertToCapped": "db.trash", size: 100000000})
+
+// Utils
+
+// Create Index
+db.collection.createIndex({ userid: 1 })
+// in background
+db.collection.createIndex({ a: 1 }, { background: true })
+// Unique
+db.collection.createIndex({ name: 1}, { unique: 1 })
+// Compound
+db.collection.createIndex({ a: 1, b: 1, c: 1 })
+// Partial - Use partial index instead of sparse index
+db.collection.createIndex({ name: 1 }, { field1: false })
+// Hashed
+db.collection.createIndex({ _id: "hashed" })
+
+
+// Get Indexes
+db.collection.getIndexes()
+
+// Drop index
+db.collection.dropIndex({ name: 1 })
+
+// Drop all indexes except _id
+db.collection.dropIndexes()
+
+// Rebuild index
+db.collection.reIndex()
+
+db.collection.isCapped()
