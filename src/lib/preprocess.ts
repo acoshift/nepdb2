@@ -3,6 +3,7 @@ import { Observable } from 'rxjs'
 import * as _ from 'lodash'
 import { objectId } from '../utils'
 import { hashSync } from 'bcryptjs'
+import * as shortid from 'shortid'
 
 function calc (k, v, config: Config): any {
   switch (k) {
@@ -12,6 +13,8 @@ function calc (k, v, config: Config): any {
       return objectId(v)
     case '$date':
       return new Date(v)
+    case '$sid':
+      return shortid.generate()
   }
   return null
 }

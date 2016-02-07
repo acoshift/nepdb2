@@ -40,6 +40,9 @@
     },
     "es6-shim/es6-shim.d.ts": {
       "commit": "46719185c564694c5583c4b7ad94dbb786ecad46"
+    },
+    "shortid/shortid.d.ts": {
+      "commit": "c393f8974d44840a6c9cc6d5b5c0188a8f05143d"
     }
   }
 }
